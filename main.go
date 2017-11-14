@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+
+	"github.com/atotto/clipboard"
 )
 
 type items struct {
@@ -21,7 +23,20 @@ type item struct {
 func main() {
 	apiKey := os.Getenv("GOOGLE_APIKEY")
 	cseID := os.Getenv("GOOGLE_CSE_ID")
-	companyName := os.Args[1]
+
+	var companyName string
+	if len(os.Args) < 2 {
+		fmt.Println("引数が省略されたため、クリップボードの内容を用いて判定します。")
+		text, err := clipboard.ReadAll()
+		if err != nil {
+			log.Fatalf("Failed to read from clipboard : %v\n", err)
+		} else {
+			companyName = text
+		}
+	} else {
+		companyName = os.Args[1]
+	}
+
 	maekabuPattern := "株式会社" + companyName
 	mae := 0
 	ushirokabuPattern := companyName + "株式会社"
@@ -49,9 +64,15 @@ func main() {
 	if mae > ushiro {
 		fmt.Println("前株です！")
 		fmt.Println(maekabuPattern)
+		if err := clipboard.WriteAll(maekabuPattern); err != nil {
+			log.Fatalf("Failed to copy to clipboard : %v\n", err)
+		}
 	} else if ushiro > mae {
 		fmt.Println("後株です！")
 		fmt.Println(ushirokabuPattern)
+		if err := clipboard.WriteAll(ushirokabuPattern); err != nil {
+			log.Fatalf("Failed to copy to clipboard : %v\n", err)
+		}
 	} else {
 		fmt.Println("わかりません！")
 	}
