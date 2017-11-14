@@ -7,6 +7,8 @@
 - 後株
     - ほげほげ株式会社
 
+判定できた際には、会社名が自動的にクリップボードにコピーされます。
+
 ## Usage
 
 `kabu` は、[Google Custom Search API](https://developers.google.com/custom-search/json-api/v1/overview) を使用するため、予め [Goole Cloud Console](https://cloud.google.com/console/project) から API キーを取得し、環境変数にセットしておく必要があります。
@@ -37,5 +39,10 @@ $ kabu はてな
 前株マッチ数:9
 後株マッチ数:0
 前株です！
+株式会社はてな
+```
+
+```sh
+# cmd + V (paste)
 株式会社はてな
 ```

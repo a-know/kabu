@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+
+	"github.com/atotto/clipboard"
 )
 
 type items struct {
@@ -49,9 +51,15 @@ func main() {
 	if mae > ushiro {
 		fmt.Println("前株です！")
 		fmt.Println(maekabuPattern)
+		if err := clipboard.WriteAll(maekabuPattern); err != nil {
+			log.Fatalf("Failed to copy to clipboard : %v\n", err)
+		}
 	} else if ushiro > mae {
 		fmt.Println("後株です！")
 		fmt.Println(ushirokabuPattern)
+		if err := clipboard.WriteAll(ushirokabuPattern); err != nil {
+			log.Fatalf("Failed to copy to clipboard : %v\n", err)
+		}
 	} else {
 		fmt.Println("わかりません！")
 	}
