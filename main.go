@@ -23,7 +23,20 @@ type item struct {
 func main() {
 	apiKey := os.Getenv("GOOGLE_APIKEY")
 	cseID := os.Getenv("GOOGLE_CSE_ID")
-	companyName := os.Args[1]
+
+	var companyName string
+	if len(os.Args) < 2 {
+		fmt.Println("引数が省略されたため、クリップボードの内容を用いて判定します。")
+		text, err := clipboard.ReadAll()
+		if err != nil {
+			log.Fatalf("Failed to read from clipboard : %v\n", err)
+		} else {
+			companyName = text
+		}
+	} else {
+		companyName = os.Args[1]
+	}
+
 	maekabuPattern := "株式会社" + companyName
 	mae := 0
 	ushirokabuPattern := companyName + "株式会社"
