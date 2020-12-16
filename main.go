@@ -15,9 +15,18 @@ type items struct {
 	Items []*item `json:"items"`
 }
 
+type outlineItems struct {
+	OutlineItems []*outlineItem `json:"items"`
+}
+
 type item struct {
 	Title   string `json:"title"`
 	Snippet string `json:"snippet"`
+}
+
+type outlineItem struct {
+	Title        string `json:"title"`
+	FormattedURL string `json:"formattedUrl"`
 }
 
 func main() {
@@ -75,6 +84,36 @@ func main() {
 		}
 	} else {
 		fmt.Println("わかりません！")
+	}
+
+	// 会社概要URLの取得
+	outlineResponse, err := http.Get("https://www.googleapis.com/customsearch/v1?key=" + apiKey + "&cx=" + cseID + "&q=" + companyName + "+株式会社+概要")
+	if err != nil {
+		log.Fatalf("Failed to search : %v\n", err)
+	}
+
+	var outlineResults outlineItems
+	defer outlineResponse.Body.Close()
+	if err := json.NewDecoder(outlineResponse.Body).Decode(&outlineResults); err != nil {
+		log.Fatalf("Failed to decode search result : %v\n", err)
+	}
+	var outlineURL string
+	for _, outlineItem := range outlineResults.OutlineItems {
+		matched, err := regexp.MatchString("概要", outlineItem.Title)
+		if err != nil {
+			log.Fatalf("Failed to regexp.MatchString : %v\n", err)
+			break
+		}
+		if matched {
+			outlineURL = outlineItem.FormattedURL
+			break
+		}
+	}
+	if outlineURL != "" {
+		fmt.Println(fmt.Sprintf("会社概要URL: %s", outlineURL))
+		if err := clipboard.WriteAll(outlineURL); err != nil {
+			log.Fatalf("Failed to copy to clipboard : %v\n", err)
+		}
 	}
 }
 
